@@ -1,3 +1,25 @@
+#==============================================================================
+#                    版本：bata 2.0
+#==============================================================================
+#郑重说明：
+#    本项目为开放性项目，可以自由使用和修改，但禁止用于商业用途。
+#    使用本项目即表示您同意自行承担使用风险，作者不对任何直接或间接的损失负责。
+#    iso下载地址为第三方公开提供，若涉及版权和病毒问题请联系删除。
+#    本项目禁止用于任何商业用途，违者必究。
+#
+#    作者：xujz 开发团队：book11（1人）
+#    心里指导：冰冰妈（个屁）
+#    玩耍朋友：冰冰妈（个屁）
+#    开源地址：https://github.com/xujz66666/-
+#    AI协助：豆包
+#==============================================================================
+
+
+
+
+
+
+
 import os # 加载库
 import time
 from urllib.request import urlopen
@@ -9,8 +31,10 @@ import platform
 from url import * # 加载url变量
 
 class Install:
-    def __init__(self):
-        self.download_dir = self.user_configuration.get('download_dir', '.')
+    def __init__(self,user_configuration={}):
+        """定义属性"""
+        self.user_configuration=user_configuration
+        self.download_dir = self.user_configuration.get('download_dir', '.') # 下载位置
         self.chunk_size = 1024 * 1024  # 1MB块大小
         self.os_type = platform.system()
 
@@ -18,10 +42,15 @@ class Install:
         """Win11硬件检测"""
         # 设置标准windows11硬件要求
         WIN11_MIN_REQUIREMENTS = {
+            #内存
             "ram_gb": 4,
+            #硬盘
             "disk_gb": 64,
+            #TPM
             "tpm_version": 2.0,
+            # cpu GHz
             "cpu_ghz_min": 1.0,
+            # cpu 内核
             "cpu_cores_min": 2,
         }
         
@@ -73,9 +102,11 @@ class Install:
     
     def download_file(self, url, filename):
         """通用下载函数，避免代码重复"""
-        save_path = os.path.join(self.download_dir, filename)
+        #下载位置
+        save_path = os.path.join(self.download_dir, filename) 
         
         if os.path.exists(save_path):
+            """文件存在处理"""
             file_size = os.path.getsize(save_path)
             print(f"\n文件 {filename} 已存在，大小: {file_size / (1024**3):.2f} GB")
             choice = input("是否重新下载? (y/n): ")
@@ -86,6 +117,7 @@ class Install:
                 return True
         
         try:
+            """定义下载与进度条"""
             print(f"\n开始下载: {filename}")
             print(f"来源: {url}")
             
@@ -116,6 +148,7 @@ class Install:
             return True
             
         except HTTPError as e:
+            """常见错误"""
             print(f"HTTP错误: {e.code} - {e.reason}")
         except URLError as e:
             print(f"URL错误: {e.reason}")
@@ -124,7 +157,7 @@ class Install:
         
         return False
     
-    # ===== 新增的ISO写入功能 =====
+            # 新增的ISO写入功能
     def _validate_iso_file(self, iso_path: str) -> bool:
         """验证ISO文件是否有效"""
         if not os.path.exists(iso_path):
@@ -197,7 +230,7 @@ class Install:
             return False
         
         if confirm:
-            print("\n⚠️  警告：此操作将清除目标设备上的所有数据！")
+            print("\n警告：此操作将清除目标设备上的所有数据！")
             print(f"ISO文件: {iso_path} ({iso_size/1024/1024:.1f}MB)")
             print(f"目标设备: {device_path}")
             if device_size:
@@ -234,15 +267,15 @@ class Install:
             time.sleep(2)
             
             elapsed_time = time.time() - start_time
-            print(f"\n✅ 操作成功完成！")
+            print(f"\n 操作成功完成！")
             print(f"总耗时: {elapsed_time:.1f}秒 | 平均速度: {iso_size/(1024*1024)/elapsed_time:.1f}MB/s")
             return True
             
         except PermissionError:
-            print("\n❌ 权限不足！请以管理员/root身份运行此程序")
+            print("\n权限不足！请以管理员/root身份运行此程序")
             return False
         except Exception as e:
-            print(f"\n❌ 写入失败：{str(e)}")
+            print(f"\n写入失败：{str(e)}")
             return False
     
     def write_iso_to_device_prompt(self, iso_path):
@@ -266,7 +299,7 @@ class Install:
         device_path = input("\n请输入目标设备路径: ").strip()
         if device_path:
             self.write_iso_to_device(iso_path, device_path)
-    # ===== ISO写入功能结束 =====
+    # ISO写入功能结束
     
     def install_system(self):
         """选择系统"""
@@ -345,4 +378,6 @@ class Install:
             self.download_file(url, save_path)
             
 
-print("施工中，请稍后")
+if __name__ == "__main__":
+    installer = Install()
+    installer.install_system()
